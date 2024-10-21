@@ -1,0 +1,52 @@
+.mainBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("../../assets/pexels-alexandr-podvalny-1227513.jpeg") no-repeat center;
+  background-size: 100%;
+  max-width: 1170px;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media (max-width: 1024px) {
+    background-size: auto 100%;
+  }
+
+  @media (min-width: 769px) {
+    height: 650px;
+  }
+
+  @media (max-width: 768px) {
+    height: 500px;
+  }
+
+  @media (max-width: 360px) {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+}
+
+.textContainer {
+  @media (min-width: 361px) {
+    width: 380px;
+  }
+
+  @media (max-width: 360px) {
+    width: 328px;
+  }
+}
+
+.title {
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.description {
+  margin-bottom: 32px;
+  color: #fff;
+}
+
+.buttonContainer {
+}

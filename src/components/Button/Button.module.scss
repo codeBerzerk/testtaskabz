@@ -1,0 +1,21 @@
+.button {
+  width: 100px;
+  height: 34px;
+  background-color: #F4E041;
+  border: none;
+  border-radius: 80px;
+  color: #000;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-family: 'Nunito', sans-serif;
+}
+
+.button:hover {
+  background-color: #FFE302;
+}
+
+.button:disabled {
+  background-color: #B4B4B4;
+  cursor: not-allowed;
+}
