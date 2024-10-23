@@ -3,6 +3,7 @@ import styles from './Users.module.scss';
 import UserCard from '../../components/UserCard/UserCard';
 import { UsersResponse, User } from '../../types/types';
 import Button from "../../components/Button/Button";
+import Loader from "../../components/Loader/Loader";
 
 const USERS_API_URL = 'https://frontend-test-assignment-api.abz.agency/api/v1/users';
 
@@ -53,14 +54,18 @@ const Users: React.FC = () => {
         <section className={styles.mainContainer}>
             <h1>Working with GET request</h1>
             <div className={styles.usersContainer}>
-                {users.map((user) => (
-                    <UserCard key={user.id} user={user} />
+                {users.map((user, index) => (
+                    <UserCard key={`${user.id}-${index}`} user={user}/>
                 ))}
             </div>
-            {loading && <p>Завантаження...</p>}
-            {error && <p>{error}</p>}
+            {loading && (
+                <div className={styles.loaderContainer}>
+                    <Loader/>
+                </div>
+            )}
+            {error && <p className={styles.errorMessage}>{error}</p>}
             {page < totalPages && !loading && !error && (
-                <Button onClick={handleShowMore}>Show more</Button>
+                <Button onClick={handleShowMore} disabled={loading}>Show more</Button>
             )}
         </section>
     );
