@@ -26,8 +26,8 @@ const RadioGroup: React.FC<RadioGroupProps> = ({ options, selectedOption, onChan
                         onChange={() => onChange(option.id)}
                         className={styles['radio-input']}
                     />
-                    <div className={styles['radio-custom']}></div>
-                    <label htmlFor={`position-${option.id}`} className={styles['radio-label']}>
+                    <label htmlFor={`position-${option.id}`}>
+                        <div className={styles['radio-custom']}></div>
                         {option.name}
                     </label>
                 </div>

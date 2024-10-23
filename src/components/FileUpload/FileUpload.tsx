@@ -3,6 +3,8 @@ import styles from './FileUpload.module.scss';
 
 interface FileUploadProps {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onBlur: () => void;
+    error?: React.ReactNode;
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ onChange }) => {

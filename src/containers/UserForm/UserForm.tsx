@@ -4,7 +4,8 @@ import InputField from '../../components/InputField/InputField';
 import RadioGroup from '../../components/RadioGroup/RadioGroup';
 import FileUpload from '../../components/FileUpload/FileUpload';
 import Button from "../../components/Button/Button";
-import successImage from "../../assets/success-image.svg"
+import PhoneInput from "../../components/InputField/PhoneInput";
+import successImage from "../../assets/success-image.svg";
 import styles from './UserForm.module.scss';
 
 const API_URL = 'https://frontend-test-assignment-api.abz.agency/api/v1/';
@@ -27,7 +28,13 @@ const UserForm: React.FC = () => {
     const [token, setToken] = useState<string | null>(null);
     const [errors, setErrors] = useState<any>({});
     const [isValid, setIsValid] = useState<boolean>(false);
-    const [isSubmitted, setIsSubmitted] = useState<boolean>(false);  // Додаємо стан для успішного відправлення форми
+    const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+    const [touched, setTouched] = useState<{ [key: string]: boolean }>({
+        name: false,
+        email: false,
+        phone: false,
+        photo: false,
+    });
 
     useEffect(() => {
         const fetchPositions = async () => {
@@ -54,46 +61,84 @@ const UserForm: React.FC = () => {
         fetchToken();
     }, []);
 
+    const validateForm = () => {
+        const newErrors: any = {};
+
+        if (!name || name.length < 2 || name.length > 60) {
+            newErrors.name = 'Name must be between 2 and 60 characters long';
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email) || email.length > 100) {
+            newErrors.email = 'Please enter a valid email (max 100 characters)';
+        }
+
+        const phoneRegex = /^\+380\d{9}$/;
+        if (!phone || !phoneRegex.test(phone)) {
+            newErrors.phone = 'Please enter a valid phone number in format +380XXXXXXXXX';
+        }
+
+        if (!photo) {
+            newErrors.photo = 'Please upload a photo';
+        } else {
+            const allowedTypes = ['image/jpeg', 'image/jpg'];
+            if (!allowedTypes.includes(photo.type)) {
+                newErrors.photo = 'Photo must be a JPEG image';
+            }
+            const maxSize = 5 * 1024 * 1024;
+            if (photo.size > maxSize) {
+                newErrors.photo = 'Photo must be less than 5 MB';
+            }
+            const img = new Image();
+            img.src = URL.createObjectURL(photo);
+            img.onload = () => {
+                if (img.width < 70 || img.height < 70) {
+                    setErrors((prevErrors: any) => ({
+                        ...prevErrors,
+                        photo: 'Photo resolution must be at least 70x70 pixels',
+                    }));
+                    setIsValid(false);
+                }
+            };
+        }
+
+        return newErrors;
+    };
+
     useEffect(() => {
-        const validateForm = () => {
-            const newErrors: any = {};
-
-            if (!name || name.length < 2) {
-                newErrors.name = 'Name must be at least 2 characters long';
-            }
-
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!email || !emailRegex.test(email)) {
-                newErrors.email = 'Please enter a valid email';
-            }
-
-            const phoneRegex = /^\+380\d{9}$/;
-            if (!phone || !phoneRegex.test(phone)) {
-                newErrors.phone = '+38 (XXX) XXX - XX - XX';
-            }
-
-            if (!photo) {
-                newErrors.photo = 'Please upload a photo';
-            }
-
-            setErrors(newErrors);
-            setIsValid(Object.keys(newErrors).length === 0);
-        };
-
-        validateForm();
-
-    }, [name, email, phone, photo]);
+        const newErrors = validateForm();
+        const formIsValid = Object.keys(newErrors).length === 0;
+        setIsValid(formIsValid);
+        setErrors(newErrors);
+    }, [name, email, phone, photo, touched]);
 
     const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             setPhoto(e.target.files[0]);
         }
+        setTouched((prev) => ({ ...prev, photo: true }));
+    };
+
+    const handleBlur = (field: string) => {
+        setTouched((prev) => ({ ...prev, [field]: true }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!isValid || !token || !positionId) {
+        setTouched({
+            name: true,
+            email: true,
+            phone: true,
+            photo: true,
+        });
+
+        const newErrors = validateForm();
+        const formIsValid = Object.keys(newErrors).length === 0;
+        setErrors(newErrors);
+        setIsValid(formIsValid);
+
+        if (!formIsValid || !token || !positionId || !photo) {
             return;
         }
 
@@ -102,7 +147,7 @@ const UserForm: React.FC = () => {
         formData.append('email', email);
         formData.append('phone', phone);
         formData.append('position_id', positionId.toString());
-        formData.append('photo', photo!);
+        formData.append('photo', photo);
 
         try {
             const response = await axios.post(USERS_URL, formData, {
@@ -115,6 +160,13 @@ const UserForm: React.FC = () => {
             setIsSubmitted(true);
         } catch (error) {
             console.error('Помилка при відправленні форми:', error);
+            if (axios.isAxiosError(error) && error.response) {
+                const apiErrors = error.response.data?.fails;
+                setErrors((prevErrors: any) => ({
+                    ...prevErrors,
+                    ...apiErrors,
+                }));
+            }
         }
     };
 
@@ -136,38 +188,43 @@ const UserForm: React.FC = () => {
                     placeholder="Your name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    error={errors.name}
+                    onBlur={() => handleBlur('name')}
+                    error={touched.name ? errors.name : ''}
                 />
-                {errors.name && <p className={styles['error-text']}>{errors.name}</p>}
+                {touched.name && errors.name && <p className={styles.errorText}>{errors.name}</p>}
             </div>
-            <div className={styles['form-group']}>
+            <div className={styles.formGroup}>
                 <InputField
                     type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    error={errors.email}
+                    onBlur={() => handleBlur('email')}
+                    error={touched.email ? errors.email : ''}
                 />
-                {errors.email && <p className={styles['error-text']}>{errors.email}</p>}
+                {touched.email && errors.email && <p className={styles.errorText}>{errors.email}</p>}
             </div>
-            <div className={styles['form-group']}>
-                <InputField
-                    type="tel"
-                    placeholder="Phone"
+            <div className={styles.formGroup}>
+                <PhoneInput
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    error={errors.phone}
+                    onBlur={() => handleBlur('phone')}
+                    error={touched.phone ? errors.phone : ''}
                 />
-                {errors.phone && <p className={styles['error-text']}>{errors.phone}</p>}
+                {touched.phone && errors.phone && <p className={styles.errorText}>{errors.phone}</p>}
             </div>
             <RadioGroup
                 options={positions}
                 selectedOption={positionId}
                 onChange={(id) => setPositionId(id)}
             />
-            <div className={styles['form-group']}>
-                <FileUpload onChange={handlePhotoChange} />
-                {errors.photo && <p className={styles['error-text']}>{errors.photo}</p>}
+            <div className={styles.formGroup}>
+                <FileUpload
+                    onChange={handlePhotoChange}
+                    onBlur={() => handleBlur('photo')}
+                    error={touched.photo ? errors.photo : ''}
+                />
+                {touched.photo && errors.photo && <p className={styles.errorText}>{errors.photo}</p>}
             </div>
             <Button type="submit" disabled={!isValid}>
                 Sign up
