@@ -51,7 +51,7 @@ const Users: React.FC = () => {
     };
 
     return (
-        <section className={styles.mainContainer}>
+        <section id="users" className={styles.mainContainer}>
             <h1>Working with GET request</h1>
             <div className={styles.usersContainer}>
                 {users.map((user, index) => (

@@ -73,9 +73,12 @@ const UserForm: React.FC = () => {
             newErrors.email = 'Please enter a valid email (max 100 characters)';
         }
 
-        const phoneRegex = /^\+380\d{9}$/;
-        if (!phone || !phoneRegex.test(phone)) {
-            newErrors.phone = 'Please enter a valid phone number in format +380XXXXXXXXX';
+        // Очистити номер телефону від нецифрових символів
+        const cleanedPhone = phone.replace(/\D/g, '');
+
+        const phoneRegex = /^380\d{9}$/;
+        if (!phone || !phoneRegex.test(cleanedPhone)) {
+            newErrors.phone = 'Please enter a valid phone number in format +38 (0XX) XXX - XX - XX';
         }
 
         if (!photo) {
@@ -145,7 +148,10 @@ const UserForm: React.FC = () => {
         const formData = new FormData();
         formData.append('name', name);
         formData.append('email', email);
-        formData.append('phone', phone);
+
+        const cleanedPhone = phone.replace(/\D/g, '');
+        formData.append('phone', '+'.concat(cleanedPhone));
+
         formData.append('position_id', positionId.toString());
         formData.append('photo', photo);
 
@@ -180,7 +186,7 @@ const UserForm: React.FC = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit} className={styles.userForm}>
+        <form id="signUp" onSubmit={handleSubmit} className={styles.userForm}>
             <h1>Working with POST request</h1>
             <div className={styles.formGroup}>
                 <InputField

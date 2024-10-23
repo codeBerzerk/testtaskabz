@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './TestAssignment.module.scss';
 import Button from '../../components/Button/Button';
+import {scrollToSignUp} from "../Header/Header";
 
 const MainBlock: React.FC = () => {
     return (
@@ -13,7 +14,7 @@ const MainBlock: React.FC = () => {
                 They should also be excited to learn, as the world of Front-End Development keeps evolving.
             </p>
             <div className={styles.buttonContainer}>
-                <Button>Sign Up</Button>
+                <Button onClick={scrollToSignUp}>Sign Up</Button>
             </div>
             </div>
         </section>
