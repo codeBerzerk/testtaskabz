@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styles from './Users.module.scss';
 import UserCard from '../../components/UserCard/UserCard';
 import { UsersResponse, User } from '../../types/types';
+import Button from "../../components/Button/Button";
 
 const USERS_API_URL = 'https://frontend-test-assignment-api.abz.agency/api/v1/users';
 
@@ -15,14 +16,18 @@ const Users: React.FC = () => {
     const fetchUsers = async (currentPage: number) => {
         setLoading(true);
         setError(null);
+        const count = currentPage === 1 ? 6 : 6;
         try {
-            const response = await fetch(`${USERS_API_URL}?page=${currentPage}&count=5`);
+            const response = await fetch(`${USERS_API_URL}?page=${currentPage}&count=${count}`);
             if (!response.ok) {
                 throw new Error('Помилка при завантаженні користувачів');
             }
             const data: UsersResponse = await response.json();
             if (data.success) {
-                setUsers((prevUsers) => [...prevUsers, ...data.users]);
+                const sortedUsers = data.users.sort(
+                    (a, b) => b.registration_timestamp - a.registration_timestamp
+                );
+                setUsers((prevUsers) => [...prevUsers, ...sortedUsers]);
                 setTotalPages(data.total_pages);
             } else {
                 throw new Error('Не вдалося отримати дані користувачів');
@@ -55,7 +60,7 @@ const Users: React.FC = () => {
             {loading && <p>Завантаження...</p>}
             {error && <p>{error}</p>}
             {page < totalPages && !loading && !error && (
-                <button onClick={handleShowMore}>Показати більше</button>
+                <Button onClick={handleShowMore}>Show more</Button>
             )}
         </section>
     );
