@@ -1,4 +1,3 @@
-// FileUpload.tsx
 import React, { useState } from 'react';
 import styles from './FileUpload.module.scss';
 
@@ -6,9 +5,10 @@ interface FileUploadProps {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onBlur: () => void;
     error?: React.ReactNode;
+    className?: string; // Визначаємо className як необов'язковий пропс
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ onChange, onBlur }) => {
+const FileUpload: React.FC<FileUploadProps> = ({ onChange, onBlur, error, className }) => {
     const [displayName, setDisplayName] = useState<string>('Upload your photo');
     const [extension, setExtension] = useState<string>('');
 
@@ -22,16 +22,15 @@ const FileUpload: React.FC<FileUploadProps> = ({ onChange, onBlur }) => {
         }
     };
 
-    // Функція для обрізання назви файлу посередині
     const formatFileName = (name: string) => {
-        const maxLength = 30; // Максимальна довжина відображуваного імені
+        const maxLength = 30;
         if (name.length <= maxLength) {
             return { truncatedName: name, fileExtension: '' };
         }
         const extIndex = name.lastIndexOf('.');
         const extension = name.substring(extIndex);
         const nameWithoutExt = name.substring(0, extIndex);
-        const charsToShow = maxLength - extension.length - 3; // 3 символи для '...'
+        const charsToShow = maxLength - extension.length - 3;
         const frontChars = Math.ceil(charsToShow / 2);
         const backChars = Math.floor(charsToShow / 2);
         const truncatedName =
@@ -42,7 +41,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onChange, onBlur }) => {
     };
 
     return (
-        <div className={styles['file-upload']}>
+        <div className={`${styles['file-upload']} ${className ? className : ''}`}>
             <label htmlFor="fileInput" className={styles['upload-button']}>
                 Upload
             </label>

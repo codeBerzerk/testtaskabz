@@ -229,8 +229,10 @@ const UserForm: React.FC = () => {
                     onChange={handlePhotoChange}
                     onBlur={() => handleBlur('photo')}
                     error={touched.photo ? errors.photo : ''}
+                    className={touched.photo && errors.photo ? styles.inputError : ''}
                 />
                 {touched.photo && errors.photo && <p className={styles.errorText}>{errors.photo}</p>}
+
             </div>
             <Button type="submit" disabled={!isValid}>
                 Sign up
