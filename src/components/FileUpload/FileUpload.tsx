@@ -5,7 +5,7 @@ interface FileUploadProps {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onBlur: () => void;
     error?: React.ReactNode;
-    className?: string; // Визначаємо className як необов'язковий пропс
+    className?: string;
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ onChange, onBlur, error, className }) => {
@@ -41,7 +41,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onChange, onBlur, error, classN
     };
 
     return (
-        <div className={`${styles['file-upload']} ${className ? className : ''}`}>
+        <div className={`${styles['file-upload']} ${error ? styles['input-error'] : ''}`}>
             <label htmlFor="fileInput" className={styles['upload-button']}>
                 Upload
             </label>

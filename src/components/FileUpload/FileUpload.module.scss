@@ -40,6 +40,7 @@
 }
 
 .file-name__text {
+  color: black;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -50,17 +51,10 @@
   margin-left: 2px;
 }
 
-.inputError {
-  border: 2px solid #CB3D40 !important;
-  background-color: #ffe6e6 !important;
+.input-error {
+  border: 2px solid #CB3D40;
 
   .upload-button {
-    border-right: 3px solid #CB3D40 !important;
+    border-right: 2px solid #CB3D40;
   }
-}
-
-.errorText {
-  color: #CB3D40;
-  font-size: 12px;
-  margin-top: 4px;
 }
